@@ -1,0 +1,13 @@
+---------------------to rename the local branch [OR] to rename the branch ------------------------------
+->git branch --move <old-name> <new-name>.
+----------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------- how to check your committed change on bitbucket ----------------------------------
+->to check your committed codes press "alt+9" and select your latest commit and press on diff(which will be two arrows like two arrow keys).you can check 
+what changes you have pushed.
+
+->git credential-cache exit: 
+     used when you are getting push failed issue that is git hub will be denying the push.
+
+
+DROP PROCEDURE IF EXISTS GetAllProducts;
