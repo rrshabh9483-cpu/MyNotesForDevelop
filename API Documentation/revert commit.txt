@@ -1,0 +1,21 @@
+(Q).How to revert the last commit?
+    To revert the last committed file in Git, you have a few options depending on what exactly you want to do 👇
+🧩 Option 1: Revert the entire last commit
+     If you want to undo the last commit (but keep history intact):
+   🧩  Run: git revert HEAD
+   Note: This creates a new commit that undoes the changes from the previous one.
+🧱 Option 2: Restore a specific file from the previous commit
+      If you only want to revert one file (not the whole commit):
+       🧱  git checkout HEAD^ -- path/to/your/file
+           Note- Then commit the restored file: git commit -m "Reverted file to previous commit"
+🧰 Option 3: Undo the last commit completely (remove it)
+     If you haven’t pushed yet and want to erase the last commit:
+     🧰  git reset --hard HEAD~1
+          Note- This deletes the commit and its changes permanently from your local branch.
+✅ Example
+If your file is src/main/java/App.java:
+    git checkout HEAD^ -- src/main/java/App.java
+    git commit -m "Revert App.java to previous version"
+
+
+      

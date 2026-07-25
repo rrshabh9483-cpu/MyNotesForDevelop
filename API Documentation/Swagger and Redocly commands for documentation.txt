@@ -1,0 +1,26 @@
+Step 1: Install Redocly CLI
+Run this command in your terminal: npm install -g @redocly/cli
+
+Step 2: Verify installation
+After installation, check if it’s recognized:redocly --version
+ Note: If this prints a version number, the CLI is ready to use.
+
+Step 3: Generate HTML from YAML
+Now run your original command: redocly build-docs openapi.yaml --output=docs.html
+
+Optional: Local preview
+If you want to preview the docs without exporting: redocly preview-docs openapi.yaml
+Note: This starts a local server (usually at http://localhost:8080) to view your API docs interactively.
+
+-> Unsupported Exception:
+ That “Unsupported specification” error means Redocly couldn’t recognize your YAML file as a valid OpenAPI specification. In other words, the file doesn’t follow the structure Redocly expects.
+Here’s how to fix it step by step 👇
+ 1. Check your YAML file format
+Open your validation-api.yaml and make sure it starts with one of these: openapi: 3.0.0 [OR] swagger: '2.0'
+Note: If neither is present, Redocly won’t know it’s an API spec.
+
+🧱 2. Validate your spec:
+   Run: redocly lint validation-api.yaml: This command will show exactly what’s wrong — missing fields, invalid structure, or syntax errors.
+      
+
+
