@@ -1,0 +1,95 @@
+--------------------------------------------------------------------------------------------------------------------------------------
+-> List all stored procedures with their referenced objects (tables, views, functions)
+SELECT 
+    p.name AS procedure_name,
+    r.referenced_schema_name AS schema_name,
+    r.referenced_entity_name AS object_name,
+    r.referenced_class_desc AS object_type
+FROM sys.procedures p
+CROSS APPLY sys.dm_sql_referenced_entities(
+    QUOTENAME(SCHEMA_NAME(p.schema_id)) + '.' + QUOTENAME(p.name), 'OBJECT'
+) r
+ORDER BY p.name, r.referenced_class_desc, r.referenced_schema_name, r.referenced_entity_name;
+
+What you’ll get:
+ procedure_name → the stored procedure name
+ schema_name → schema of the referenced object
+ object_name → name of the table, view, or function
+ object_type → tells you whether it’s a OBJECT (table/view) or SQL_SCALAR_FUNCTION, SQL_INLINE_TABLE_VALUED_FUNCTION, etc.
+--------------------------------------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------------------------------------------
+1. Use sys.sql_modules with sys.objects
+SELECT o.name AS procedure_name,
+       sm.definition AS procedure_definition
+FROM sys.objects o
+JOIN sys.sql_modules sm ON o.object_id = sm.object_id
+WHERE o.type = 'P'   -- P = Stored Procedure
+  AND o.name = 'YourProcedureName';
+
+Explanation: This gives you the full text of the stored procedure. From there, you can manually check which tables are referenced.
+--------------------------------------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------------------------------------------
+2. Use sys.dm_sql_referenced_entities: this DMV can extract dependencies (tables, views, etc.) referenced by a stored procedure:
+command:
+SELECT referenced_entity_name AS table_name,
+       referenced_schema_name AS schema_name,
+       referenced_database_name AS database_name
+FROM sys.dm_sql_referenced_entities ('dbo.YourProcedureName', 'OBJECT')
+WHERE referenced_class_desc = 'OBJECT';
+
+Note: Replace dbo.YourProcedureName with your procedure’s schema and name.
+This will return all objects (including tables) that the procedure references.
+--------------------------------------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------------------------------------------
+(3).  that will list all stored procedures in a database along with the tables they reference. This uses the dependency 
+DMV sys.dm_sql_referenced_entities:
+
+command:Loop through all stored procedures and list referenced tables 
+SELECT 
+    p.name AS procedure_name,
+    r.referenced_schema_name AS schema_name,
+    r.referenced_entity_name AS table_name
+FROM sys.procedures p
+CROSS APPLY sys.dm_sql_referenced_entities(
+    QUOTENAME(SCHEMA_NAME(p.schema_id)) + '.' + QUOTENAME(p.name), 'OBJECT'
+) r
+WHERE r.referenced_class_desc = 'OBJECT'
+ORDER BY p.name, r.referenced_schema_name, r.referenced_entity_name;
+
+What this does:
+sys.procedures → gets all stored procedures in the current database.
+sys.dm_sql_referenced_entities → extracts all objects (tables, views, etc.) referenced by each procedure.
+WHERE r.referenced_class_desc = 'OBJECT' → filters only actual objects (like tables).
+ORDER BY → sorts neatly by procedure and table.
+--------------------------------------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------------------------------------------
+(4).extending the query to include tables, views, and functions referenced by stored procedures gives you a full dependency map. Here’s the script:
+SQL COmmand: List all stored procedures with their referenced objects (tables, views, functions)
+
+SELECT 
+    p.name AS procedure_name,
+    r.referenced_schema_name AS schema_name,
+    r.referenced_entity_name AS object_name,
+    r.referenced_class_desc AS object_type
+FROM sys.procedures p
+CROSS APPLY sys.dm_sql_referenced_entities(
+    QUOTENAME(SCHEMA_NAME(p.schema_id)) + '.' + QUOTENAME(p.name), 'OBJECT'
+) r
+ORDER BY p.name, r.referenced_class_desc, r.referenced_schema_name, r.referenced_entity_name;
+
+Explanations:
+procedure_name → the stored procedure name
+schema_name → schema of the referenced object
+object_name → name of the table, view, or function
+object_type → tells you whether it’s a OBJECT (table/view) or SQL_SCALAR_FUNCTION, SQL_INLINE_TABLE_VALUED_FUNCTION, etc.
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------------------------------------------
+

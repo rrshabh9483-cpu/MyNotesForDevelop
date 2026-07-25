@@ -1,0 +1,26 @@
+(1).select saleDate, productName,count(*) as "total sold products" from salesdata  group by saleDate,productName order by saleDate;
+(2).select saleDate, productName,count(*) as "total sold products" from salesdata  group by saleDate,productName order by [total sold products];
+
+
+--------------------------------------------------------------------------------
+SQL command: -> to see all the tables in any database:  If you want to count tables from a specific database, 
+you need to explicitly reference that database:
+
+SELECT COUNT(*) AS table_count
+FROM [YourDatabaseName].sys.tables;
+---------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+To fetch the list of tables present in a database in SQL Server, you can use one of these queries:
+(1).SELECT name AS table_name
+FROM [YourDatabaseName].sys.tables
+ORDER BY name;
+
+(2).SELECT TABLE_NAME
+FROM [YourDatabaseName].INFORMATION_SCHEMA.TABLES
+WHERE TABLE_TYPE = 'BASE TABLE'
+ORDER BY TABLE_NAME;
+explanation:
+-> sys.tables → gives you all user tables in the database.
+-> INFORMATION_SCHEMA.TABLES → standard view, useful if you want portability across different SQL systems.
+--------------------------------------------------------------------------------------------------------------
