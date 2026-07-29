@@ -1,0 +1,86 @@
+-> That error means Hibernate found a collection field in one of your entities (AddressOfUsers) but doesn’t know how to map it — it’s missing a relationship or element collection annotation.
+
+let’s fix it step by step 👇
+
+🧩 Example 1 — Using @OneToMany (if AddressOfUsers is an entity)
+If each user can have multiple addresses stored as separate entities:
+ ------------------------------------------------------------------------------------------
+@Entity
+@Table(name = "users")
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    // ✅ Correct mapping for entity collection
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AddressOfUsers> addresses = new ArrayList<>();
+
+    // getters and setters
+}
+
+     And your AddressOfUsers entity:
+-------------------------------------------------------------------------------
+      @Entity
+@Table(name = "addresses")
+public class AddressOfUsers {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String city;
+    private String state;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    // getters and setters
+}
+-----------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+
+🧩 Example 2 — Using @ElementCollection (if AddressOfUsers is NOT an entity)
+If AddressOfUsers is just a simple value object (no separate table):
+------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+@Embeddable
+public class AddressOfUsers {
+    private String city;
+    private String state;
+}
+-----------------------------------------------------------------------------
+Then in your User entity:
+-----------------------------------------------------------------------------
+@Entity
+@Table(name = "users")
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    // ✅ Correct mapping for basic collection
+    @ElementCollection
+    @CollectionTable(name = "user_addresses", joinColumns = @JoinColumn(name = "user_id"))
+    private List<AddressOfUsers> addresses = new ArrayList<>();
+
+    // getters and setters
+}
+-----------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+✅ Summary
+-> Use @OneToMany if AddressOfUsers is an entity with its own table.
+-> Use @ElementCollection + @Embeddable if it’s just a value object.
+-> Make sure the package and imports are correct (jakarta.persistence.* or javax.persistence.* depending on your Spring Boot version).
+
+
+   
